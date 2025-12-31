@@ -50,13 +50,27 @@ public class OtpService : IOtpService
 
     public async Task<bool> ValidateOtpAsync(string email, string otp)
     {
-        var otpCode = await _context.OtpCodes
-            .Where(o => o.Email == email && o.Code == otp && !o.IsUsed && o.ExpiresAt > DateTime.UtcNow)
-            .FirstOrDefaultAsync();
+        var now = DateTime.UtcNow;
+        
+        // Find OTP without time check first for debugging
+        var allOtps = await _context.OtpCodes
+            .Where(o => o.Email == email && o.Code == otp)
+            .OrderByDescending(o => o.Id)
+            .ToListAsync();
+        
+        _logger.LogInformation("Found {Count} OTPs for {Email} with code {Code}", allOtps.Count, email, otp);
+        
+        foreach (var o in allOtps)
+        {
+            _logger.LogInformation("OTP Id={Id}, ExpiresAt={ExpiresAt}, Now={Now}, IsUsed={IsUsed}, IsExpired={IsExpired}", 
+                o.Id, o.ExpiresAt, now, o.IsUsed, o.ExpiresAt <= now);
+        }
+
+        var otpCode = allOtps.FirstOrDefault(o => !o.IsUsed && o.ExpiresAt > now);
 
         if (otpCode == null)
         {
-            _logger.LogWarning("Invalid or expired OTP attempt for {Email}", email);
+            _logger.LogWarning("Invalid or expired OTP attempt for {Email}. CurrentTime={Now}", email, now);
             return false;
         }
 

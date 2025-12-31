@@ -9,6 +9,13 @@ public class AppDbContext : DbContext
     {
     }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Configure all DateTime properties to use UTC
+        configurationBuilder.Properties<DateTime>()
+            .HaveConversion<DateTimeUtcConverter>();
+    }
+
     public DbSet<User> Users { get; set; }
     public DbSet<OtpCode> OtpCodes { get; set; }
 
