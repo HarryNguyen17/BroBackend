@@ -1,0 +1,24 @@
+databases:
+  - name: grabsim-db
+    databaseName: grabsimulator
+    user: grabsim_user
+    plan: free
+
+services:
+  - type: web
+    name: grabsim-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /swagger
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: grabsim-db
+          property: connectionString
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: GrabSimulator
+      - key: Jwt__Audience
+        value: GrabSimulatorClient
+

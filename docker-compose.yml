@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16
+    container_name: grabsim-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: grabsim_user
+      POSTGRES_PASSWORD: grabsim_password_123
+      POSTGRES_DB: grabsimulator
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grabsim_user -d grabsimulator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Application
+  api:
+    build: .
+    container_name: grabsim-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=grabsimulator;Username=grabsim_user;Password=grabsim_password_123
+      - Jwt__Key=YourSuperSecretKeyForJWT_MinimumThirtyTwoCharacters!
+      - Jwt__Issuer=GrabSimulator
+      - Jwt__Audience=GrabSimulatorClient
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+

@@ -1,0 +1,13 @@
+bin/
+obj/
+.git/
+.gitignore
+.env
+*.md
+*.txt
+myApp/
+**/*.user
+**/*.log
+.vs/
+.vscode/
+
