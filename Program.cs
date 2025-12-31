@@ -54,12 +54,12 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // Register services
-// Use ResendEmailService for production (Render blocks SMTP)
+// Use BrevoEmailService for production (Render blocks SMTP, Brevo allows 300 emails/day free)
 // Use SmtpEmailService for local development
-var useResend = !string.IsNullOrEmpty(builder.Configuration["Resend:ApiKey"]);
-if (useResend)
+var useBrevo = !string.IsNullOrEmpty(builder.Configuration["Brevo:ApiKey"]);
+if (useBrevo)
 {
-    builder.Services.AddScoped<IEmailService, ResendEmailService>();
+    builder.Services.AddScoped<IEmailService, BrevoEmailService>();
 }
 else
 {
