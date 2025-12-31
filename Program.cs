@@ -54,7 +54,17 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // Register services
-builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+// Use ResendEmailService for production (Render blocks SMTP)
+// Use SmtpEmailService for local development
+var useResend = !string.IsNullOrEmpty(builder.Configuration["Resend:ApiKey"]);
+if (useResend)
+{
+    builder.Services.AddScoped<IEmailService, ResendEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+}
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
