@@ -34,14 +34,17 @@ public class LeaderboardController : ControllerBase
                 top = DefaultTopCount;
             }
 
+            // value = TotalShipmentDelivered * TotalIncome
             var entries = await _context.Users
-                .OrderByDescending(u => u.Coins)
-                .ThenBy(u => u.CreatedAt) // Tie-breaker for same coin count
+                .OrderByDescending(u => (long)u.TotalShipmentDelivered * u.TotalIncome)
+                .ThenBy(u => u.CreatedAt) // Tie-breaker for same value
                 .Take(top)
                 .Select(u => new LeaderboardEntry
                 {
                     Email = u.Email,
-                    Coins = u.Coins
+                    TotalShipmentDelivered = u.TotalShipmentDelivered,
+                    TotalIncome = u.TotalIncome,
+                    Value = (long)u.TotalShipmentDelivered * u.TotalIncome
                 })
                 .ToListAsync();
 

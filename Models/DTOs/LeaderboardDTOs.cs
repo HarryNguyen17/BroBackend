@@ -4,7 +4,9 @@ public class LeaderboardEntry
 {
     public int Rank { get; set; }
     public string Email { get; set; } = string.Empty;
-    public long Coins { get; set; }
+    public int TotalShipmentDelivered { get; set; }
+    public long TotalIncome { get; set; }
+    public long Value { get; set; } // = TotalShipmentDelivered * TotalIncome
 }
 
 public class LeaderboardResponse
